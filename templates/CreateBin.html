@@ -1,0 +1,32 @@
+html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign</title>
+<style>
+        div{
+        position : absolute;
+        right : 10px;
+        top : 5px
+        }
+    </style>
+</head>
+<body>
+<div>
+
+<button type="button" onclick="location.href='{% url 'log' %}'">Logout</button>
+    </div>
+<H2>Create Daily Progress Report</H2>
+<form action="/post_create_bin/" method="post">
+    {% csrf_token %}
+    Latitude :
+    <input type="text" name="lat" required><br><br>
+    Longitude:
+	<input type="text" name="lon" required><br><br>
+	Capacity:
+	<input type="text" name="capacity" required><br><br>
+    <br><br>
+    <input type="submit" value="Submit">
+
+</form>
+</body>
+</html>

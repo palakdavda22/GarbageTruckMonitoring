@@ -23,4 +23,9 @@ urlpatterns = [
     url(r'^$',views.signIn),
     url(r'^postsign/',views.postsign),
     url(r'^logout/',views.logout,name="log"),
+    url(r'^createbin/',views.create_bin,name='create_bin'),
+    url(r'^post_create_bin/',views.post_create_bin,name='post_create_bin'),
+    url(r'^createdriver/',views.create_driver,name='create_driver'),
+    url(r'^post_create_driver/', views.post_create_driver, name="post_create_driver" ),
+    url(r'^check/',views.check,name='check'),
 ]

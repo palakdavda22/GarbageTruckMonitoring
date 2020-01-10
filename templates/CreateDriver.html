@@ -1,0 +1,38 @@
+html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign</title>
+<style>
+        div{
+        position : absolute;
+        right : 10px;
+        top : 5px
+        }
+    </style>
+</head>
+<body>
+<div>
+
+<button type="button" onclick="location.href='{% url 'log' %}'">Logout</button>
+    </div>
+<H2>Create Daily Progress Report</H2>
+<form action="/post_create_driver/" method="post">
+	{% csrf_token %}
+	Aadhar ID :
+    <input type="text" name="aadhar" required><br><br>
+    Name :
+    <input type="text" name="name" required><br><br>
+    Address :
+	<input type="text" name="address" required><br><br>
+	Gender:
+	<input type="text" name="gender" required><br><br>
+	Age:
+	<input type="text" name="age" required><br><br>
+	Joining Date:
+	<input type="text" name="joiningdate" required><br><br>
+    <br><br>
+    <input type="submit" value="Submit">
+
+</form>
+</body>
+</html>
