@@ -167,3 +167,34 @@ def check(request):
 
    
     return render(request,'check.html',{'comb_lis':comb_lis,'comb_lis_bin':comb_lis_bin,'e':"Palak"})
+
+def check_queries(request):
+    citizendetails = database.child('Citizen').get().val()
+    citizen_details=[]
+    for i in citizendetails:
+
+        citizen_details.append(i)
+
+    citizen_details.sort(reverse=True)
+    
+    address = []
+    image = []
+    name = []
+    query = []
+    
+    for i in citizen_details:
+
+        addr=database.child('Citizen').child(i).child('address').get().val()
+        address.append(addr)
+        img=database.child('Citizen').child(i).child('image').get().val()
+        image.append(img)
+        que=database.child('Citizen').child(i).child('query').get().val()
+        query.append(que)
+        n=database.child('Citizen').child(i).child('name').get().val()
+        name.append(n)
+
+    
+    comb_lis_query = zip(name,address,query,image)
+
+   
+    return render(request,'checkQueries.html',{'comb_lis_query':comb_lis_query,'e':"Palak"})

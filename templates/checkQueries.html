@@ -1,0 +1,31 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Title</title>
+<style>
+        div{
+        position : absolute;
+        right : 10px;
+        top : 5px
+        }
+    </style>
+</head>
+<body>
+<div>
+<button type="button" onclick="location.href='{% url 'log' %}'">Logout</button>
+</div>
+<h2>Queries</h2>
+
+<br><br>
+{% for name,address,query,image in comb_lis_query %}
+
+<h4>Name: {{name}}  &nbsp; Address: {{address}} &nbsp; Query:{{query}} &nbsp;</h4>
+<img src="{{image}}" alt="" widht="300px" height="300px"><br>
+
+
+
+
+{% endfor %}
+
+</body>
+</html>
