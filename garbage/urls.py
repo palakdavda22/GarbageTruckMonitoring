@@ -28,5 +28,8 @@ urlpatterns = [
     url(r'^createdriver/',views.create_driver,name='create_driver'),
     url(r'^post_create_driver/', views.post_create_driver, name="post_create_driver" ),
     url(r'^check/',views.check,name='check'),
-    url(r'^check_queries/', views.check_queries, name='check_queries')
+    url(r'^check_queries/', views.check_queries, name='check_queries'),
+    url(r'^generateroutes/', views.generate_routes, name = 'routes'),
+    url(r'^createvehicle/', views.create_vehicle, name = 'vehicles'),
+    url(r'^post_create_vehicle/',views.post_create_vehicle,name='post_create_vehicle'),
 ]
