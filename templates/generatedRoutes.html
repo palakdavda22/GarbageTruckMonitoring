@@ -2,9 +2,127 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Routes</title>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map-canvas {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA3W-x4zqHwfCJ2xgzLvuO1MVPlWwp_XJI">
+    </script>
 </head>
 <body>
+<h1>Routes</h1>
+<p>{{ route }}</p>
+<div id="map-canvas" style="width: 500px; height: 400px;"></div>
+<button id="get">Generate Routes</button>
+
+<script>
+    var stepDisplay;
+    var markerArray = [];
+
+    var dirDisplay = new google.maps.DirectionsRenderer();
+    var dirService = new google.maps.DirectionsService();
+    var map;
+    var i;
+    var allLongLat = {{ route |safe|escape}};
+    console.log(allLongLat);
+    for(var key in allLongLat ) {
+        var value = allLongLat[key];
+    {#console.log(value);#}
+       console.log(value[value.length-1]);
+       var sLat = value[0][0];
+       var sLong = value[0][1];
+       var dLat = value[value.length-1][0];
+       var dLong = value[value.length-1][1];
+       var src = new google.maps.LatLng(sLat ,sLong);
+       var dest = new google.maps.LatLng(dLat ,dLong);
+    }
+
+
+
+    var waypts = [];
+    waypts.push({
+        location: new google.maps.LatLng(19.3720419 ,72.8268988),
+        stopover: true
+      });
+
+    waypts.push({
+        location: new google.maps.LatLng(19.3720507 ,72.8268628),
+        stopover: true
+      });
+
+
+    waypts.push({
+        location: new google.maps.LatLng(19.3844215 ,72.8221597),
+        stopover: true
+      });
+
+    var mapOptions = {
+      zoom:14,
+      center:src
+    };
+
+    {#map =  new google.maps.Map(document.getElementById('map-canvas'),mapOptions);#}
+    {#stepDisplay = new google.maps.InfoWindow();#}
+    {#dirDisplay.setMap(map);#}
+    function calRoute(listener) {
+        for (i = 0; i < markerArray.length; i++) {
+            markerArray[i].setMap(null);
+        }
+
+        alert(src);
+        alert(dest);
+        var request = {
+            'origin': src,
+            'destination': dest,
+            'travelMode': 'DRIVING',
+             'waypoints': waypts,
+        };
+        function showSteps(directionResult) {
+          // For each step, place a marker, and add the text to the marker's
+          // info window. Also attach the marker to an array so we
+          // can keep track of it and remove it when calculating new
+          // routes.
+          var myRoute = directionResult.routes[0].legs[0];
+
+          for (var i = 0; i < myRoute.steps.length; i++) {
+              var marker = new google.maps.Marker({
+                position: myRoute.steps[i].start_point,
+                map: map
+              });
+              attachInstructionText(marker, myRoute.steps[i].instructions);
+              markerArray[i] = marker;
+          }
+        }
+
+        function attachInstructionText(marker, text) {
+          google.maps.event.addListener(marker, 'click', function () {
+              stepDisplay.setContent(text);
+              stepDisplay.open(map, marker);
+          });
+        }
+        dirService.route(request, function (result, status) {
+            if(status == 'OK'){
+                dirDisplay.setDirections(result);
+                //showSteps(result);
+            }
+        });
+    }
+    document.getElementById('get').onclick = function () {
+        calRoute();
+    };
+
+</script>
 
 </body>
 </html>
