@@ -28,99 +28,152 @@
 
 <script>
     var stepDisplay;
-    var markerArray = [];
+    var resultGlobal = [];
 
     var dirDisplay = new google.maps.DirectionsRenderer();
     var dirService = new google.maps.DirectionsService();
     var map;
-    var i;
     var allLongLat = {{ route |safe|escape}};
-    console.log(allLongLat);
-    for(var key in allLongLat ) {
-        var value = allLongLat[key];
-    {#console.log(value);#}
-       console.log(value[value.length-1]);
-       var sLat = value[0][0];
-       var sLong = value[0][1];
-       var dLat = value[value.length-1][0];
-       var dLong = value[value.length-1][1];
-       var src = new google.maps.LatLng(sLat ,sLong);
-       var dest = new google.maps.LatLng(dLat ,dLong);
-    }
-
-
-
-    var waypts = [];
-    waypts.push({
-        location: new google.maps.LatLng(19.3720419 ,72.8268988),
-        stopover: true
-      });
-
-    waypts.push({
-        location: new google.maps.LatLng(19.3720507 ,72.8268628),
-        stopover: true
-      });
-
-
-    waypts.push({
-        location: new google.maps.LatLng(19.3844215 ,72.8221597),
-        stopover: true
-      });
-
+    var sourceDefault = new google.maps.LatLng(allLongLat[{{ veh1 }}][0][0],allLongLat[{{ veh1 }}][0][1]);
+    {#console.log(sourceDefault);#}
     var mapOptions = {
-      zoom:14,
-      center:src
-    };
-
-    {#map =  new google.maps.Map(document.getElementById('map-canvas'),mapOptions);#}
-    {#stepDisplay = new google.maps.InfoWindow();#}
-    {#dirDisplay.setMap(map);#}
-    function calRoute(listener) {
-        for (i = 0; i < markerArray.length; i++) {
-            markerArray[i].setMap(null);
-        }
-
-        alert(src);
-        alert(dest);
-        var request = {
-            'origin': src,
-            'destination': dest,
-            'travelMode': 'DRIVING',
-             'waypoints': waypts,
+        zoom:14,
+        center:sourceDefault
         };
-        function showSteps(directionResult) {
-          // For each step, place a marker, and add the text to the marker's
-          // info window. Also attach the marker to an array so we
-          // can keep track of it and remove it when calculating new
-          // routes.
-          var myRoute = directionResult.routes[0].legs[0];
+    map =  new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
 
-          for (var i = 0; i < myRoute.steps.length; i++) {
-              var marker = new google.maps.Marker({
-                position: myRoute.steps[i].start_point,
-                map: map
-              });
-              attachInstructionText(marker, myRoute.steps[i].instructions);
-              markerArray[i] = marker;
-          }
-        }
+    stepDisplay = new google.maps.InfoWindow();
+    dirDisplay.setMap(map);
 
-        function attachInstructionText(marker, text) {
-          google.maps.event.addListener(marker, 'click', function () {
-              stepDisplay.setContent(text);
-              stepDisplay.open(map, marker);
-          });
-        }
-        dirService.route(request, function (result, status) {
-            if(status == 'OK'){
-                dirDisplay.setDirections(result);
-                //showSteps(result);
+    let markersArray = [];
+    function calRoute(listener) {
+
+        var request = [];
+        for (var key in allLongLat) {
+            {#   for (i = 0; i < markersArray.length; i++) {#}
+            {#       markersArray[i].setMap(null);#}
+            //}
+            var value = allLongLat[key];
+            {#console.log(value);#}
+            {#console.log(value[value.length - 1]);#}
+            var sLat = value[0][0];
+            var sLong = value[0][1];
+            var dLat = value[value.length - 1][0];
+            var dLong = value[value.length - 1][1];
+            var src = new google.maps.LatLng(sLat, sLong);
+            var dest = new google.maps.LatLng(dLat, dLong);
+            {#addMarker({lat: parseInt(sLat), lng: parseInt(sLong)}, "red");#}
+            var waypts = [];
+            var i;
+            for (i = 1; i < value.length - 1; i++) {
+                var lat = value[i][0];
+                var long = value[i][1];
+                {#addMarker({lat: parseInt(lat), lng: parseInt(long)}, "yellow");#}
+                waypts.push({
+                    location: new google.maps.LatLng(lat, long),
+                    stopover: true
+                });
             }
-        });
+
+            request = {
+                'origin': src,
+                'destination': dest,
+                'travelMode': 'DRIVING',
+                'waypoints': waypts,
+            };
+
+            dirService.route(request, function (result, status) {
+                    if (status == 'OK') {
+                        //resultGlobal.push(result);
+                        dirDisplay.setDirections(result);
+                    }
+                    //showSteps(result);
+                }
+            );
+        }
+
+
+        {#function showSteps(directionResult) {#}
+        {#  var myRoute = directionResult.routes[0].legs[0];#}
+        {##}
+        {#  for (var i = 0; i < myRoute.steps.length; i++) {#}
+        {#      var marker = new google.maps.Marker({#}
+        {#        position: myRoute.steps[i].start_point,#}
+        {#        map: map#}
+        {#      });#}
+        {#      attachInstructionText(marker, myRoute.steps[i].instructions);#}
+        {#      markerArray[i] = marker;#}
+        {#  }#}
+        //}
+
+        {#function attachInstructionText(marker, text) {#}
+        {#  google.maps.event.addListener(marker, 'click', function () {#}
+        {#      stepDisplay.setContent(text);#}
+        {#      stepDisplay.open(map, marker);#}
+        {#  });#}
+        //}
     }
+    function showDirections(){
+        for(var i=0;i<resultGlobal.length;i++){
+            dirDisplay.setDirections(resultGlobal[i]);
+            //renderDirectionsPolylines(resultGlobal[i]);
+        }
+
+    }
+    var polylineOptions = {
+      strokeColor: '#C83939',
+      strokeOpacity: 1,
+      strokeWeight: 4
+    };
+    var colors = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF"];
+    var polylines = [];
+    function renderDirectionsPolylines(response) {
+      var bounds = new google.maps.LatLngBounds();
+      for (var i = 0; i < polylines.length; i++) {
+        polylines[i].setMap(null);
+      }
+      var legs = response.routes[0].legs;
+      console.log(legs);
+      for (i = 0; i < legs.length; i++) {
+        var steps = legs[i].steps;
+        for (j = 0; j < steps.length; j++) {
+          var nextSegment = steps[j].path;
+          var stepPolyline = new google.maps.Polyline(polylineOptions);
+          stepPolyline.setOptions({
+            strokeColor: colors[i]
+          });
+            stepPolyline.getPath().push(nextSegment);
+            bounds.extend(nextSegment);
+
+          polylines.push(stepPolyline);
+          stepPolyline.setMap(map);
+        }
+      }
+      map.fitBounds(bounds);
+    }
+
+
+
+
+    function addMarker(latLng, color) {
+          let url = "http://maps.google.com/mapfiles/ms/icons/";
+          url += color + "-dot.png";
+
+          let marker = new google.maps.Marker({
+            map: map,
+            position: latLng,
+            icon: {
+              url: url
+            }
+          });
+          //store the marker object drawn in global array
+          markersArray.push(marker);
+        }
     document.getElementById('get').onclick = function () {
         calRoute();
+        showDirections();
     };
+
 
 </script>
 

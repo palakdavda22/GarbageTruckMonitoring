@@ -18,14 +18,14 @@
 <H2>Create Daily Progress Report</H2>
 <form action="/post_create_bin/" method="post">
     {% csrf_token %}
-    BinId:
-    <input type="text" name="binId" required><br><br>
     Latitude :
     <input type="text" name="lat" required><br><br>
     Longitude:
 	<input type="text" name="lon" required><br><br>
 	Capacity:
 	<input type="text" name="capacity" required><br><br>
+    <br><br>
+    <input type="text" name="height" required><br><br>
     <br><br>
     <input type="submit" value="Submit">
 </form>

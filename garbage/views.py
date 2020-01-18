@@ -7,8 +7,10 @@ import json
 import urllib.request
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
-
+from datetime import date
+from datetime import datetime
 import pyrebase
+import json
 
 
 config = {
@@ -27,6 +29,7 @@ database=firebase.database()
 
 def signIn(request):
 	return render(request, "sign.html")
+
 def postsign(request):
 	email=request.POST.get('email')
 	passw = request.POST.get("pass")
@@ -45,29 +48,82 @@ def logout(request):
     return render(request,'sign.html')
 
 
+def get_latlong(request) :
+    # db = firebase.database()
+    # bin = db.child("Bin").get().val()
+    # lat,lon = [],[]
+    # print(bin)
+    # for i in bin :
+    #
+    #     lat.append(float(db.child("Bin").child(i).child("latitude").get().val()))
+    #     lon.append(float(db.child("Bin").child(i).child("longitude").get().val()))
+    # print(lat,lon)
+    # lat = json.dumps(lat)
+    # lon = json.dumps(lon)
+    # return render(request,"latlongmap.html",{"lat":lat,"lon":lon})
+
+    db = firebase.database()
+    bin = db.child("Bin").get().val()
+    lat, lon, cap = [], [], []
+    cap_70, cap_20, cap_20_70 = [], [], []
+    print(bin)
+    for i in bin:
+        height = (int(db.child("Bin").child(i).child("height").get().val()))
+        lati = (float(db.child("Bin").child(i).child("latitude").get().val()))
+        long = (float(db.child("Bin").child(i).child("longitude").get().val()))
+
+        var = db.child("BinPerLevel").child('19-312251|72-8513579').child("2020-01-12").get().val()
+        print(next(reversed(var)))
+        height2 = db.child("BinPerLevel").child('19-312251|72-8513579').child("2020-01-12").child(
+            next(reversed(var))).child(
+            "height").get().val()
+
+        # for i in var :
+        #     print(i)
+        # from datetime import date, datetime
+        # today = date.today()
+        # now = datetime.now()
+        # dt_string = now.strftime("%H:%M")
+        # height2 = (int(db.child("BinPerLevel").child(data).child("height").get().val()))
+        perc = (int(height2) / height) * 100
+        if perc >= 70:
+            cap_70.append([lati, long])
+        elif perc <= 20:
+            cap_20.append([lati, long])
+        else:
+            cap_20_70.append([lati, long])
+    cap_20 = json.dumps(cap_20)
+    cap_20_70 = json.dumps(cap_20_70)
+    cap_70 = json.dumps(cap_70)
+    return render(request, 'latlong.html', {"cap_20": cap_20, "cap_70": cap_70, "cap_20_70": cap_20_70})
 
 def create_bin(request):
 
     return render(request,'CreateBin.html')
 
 def post_create_bin(request):
-    id = int(request.POST.get('binId'))
-    lat = (request.POST.get('lat'))
-    lon =(request.POST.get('lon'))
-
+    lat = str(request.POST.get('lat'))
+    lon = str(request.POST.get('lon'))
+    lat = lat.replace(".","-")
+    lon = lon.replace(".", "-")
+    id = lat + "|" + lon
+    lat = lat.replace("-", ".")
+    lon = lon.replace("-", ".")
     print(id)
     capacity = request.POST.get('capacity')
+    height = request.POST.get("height")
     idtoken= request.session['uid']
     a = authe.get_account_info(idtoken)
     a = a['users']
     a = a[0]
     a = a['localId']
 
-   
+
     data = {
         "latitude":lat,
         'longitude':lon,
-		'capcity':capacity
+		'capcity':capacity,
+        'height' :height
     }
     database.child('Bin').child(id).set(data)
     # name = database.child('users').child(id).child('details').child('name').get().val()
@@ -82,22 +138,25 @@ def create_vehicle(request):
 
 
 def post_create_vehicle(request):
-    vehicle_no = request.POST.get('vehicleNo')
-    capacity = int(request.POST.get('capacity'))
-    idtoken = request.session['uid']
-    a = authe.get_account_info(idtoken)
-    a = a['users']
-    a = a[0]
-    a = a['localId']
+    if request.method == 'POST':
+        vehicle_no = str(request.POST.get('vehicleNo'))
+        capacity = str(request.POST.get('capacity'))
+        idtoken = request.session['uid']
+        print(vehicle_no)
+        a = authe.get_account_info(idtoken)
+        a = a['users']
+        a = a[0]
+        a = a['localId']
 
-    data = {
-        'capacity': capacity
-    }
-    database.child('Vehicle').child(vehicle_no).set(data)
-    print(database.child('Vehicle').get().val())
-    name = "vinal"
-    return render(request, 'welcome.html', {'e': name})
-
+        data = {
+            'capacity': capacity
+        }
+        print(data)
+        database.child('Vehicle').child(vehicle_no).set(data)
+        print(database.child('Vehicle').get().val())
+        name = "vinal"
+        #return render(request, 'welcome.html', {'e': name})
+    return render(request, 'welcome.html')
 
 def create_driver(request):
 	return render(request, 'CreateDriver.html')
@@ -109,14 +168,14 @@ def post_create_driver(request):
 	gender =request.POST.get('gender')
 	date =request.POST.get('joiningdate')
 	aadhar = str(name) + str(date)
-	
+
 	idtoken= request.session['uid']
 	a = authe.get_account_info(idtoken)
 	a = a['users']
 	a = a[0]
 	a = a['localId']
 
-   
+
 	data = {
         "name":name,
         'age':age,
@@ -130,7 +189,7 @@ def post_create_driver(request):
 
 
 def check(request):
-   
+
 # --------------------------Driver
     timestamps = database.child('Driver').get().val()
     lis_time=[]
@@ -164,7 +223,7 @@ def check(request):
     print(age)
     print(gender)
     print(date)
-    
+
 
     comb_lis = zip(name,address,age,gender,date)
 
@@ -176,25 +235,25 @@ def check(request):
         bin_details.append(i)
 
     bin_details.sort(reverse=True)
-    
+
     latitude = []
     longitude = []
     capacity = []
-    
+
     for i in bin_details:
 
         lat=database.child('Bin').child(i).child('latitude').get().val()
         latitude.append(lat)
         lon=database.child('Bin').child(i).child('longitude').get().val()
         longitude.append(lon)
-        
+
         cap=database.child('Bin').child(i).child('capacity').get().val()
         capacity.append(cap)
 
-    
+
     comb_lis_bin = zip(latitude,longitude,capacity)
 
-   
+
     return render(request,'check.html',{'comb_lis':comb_lis,'comb_lis_bin':comb_lis_bin,'e':"Palak"})
 
 def check_queries(request):
@@ -205,12 +264,12 @@ def check_queries(request):
         citizen_details.append(i)
 
     citizen_details.sort(reverse=True)
-    
+
     address = []
     image = []
     name = []
     query = []
-    
+
     for i in citizen_details:
 
         addr=database.child('Citizen').child(i).child('address').get().val()
@@ -222,10 +281,10 @@ def check_queries(request):
         n=database.child('Citizen').child(i).child('name').get().val()
         name.append(n)
 
-    
+
     comb_lis_query = zip(name,address,query,image)
 
-   
+
     return render(request,'checkQueries.html',{'comb_lis_query':comb_lis_query,'e':"Palak"})
 
 def create_distance_matrix(data):
@@ -294,28 +353,32 @@ def get_routes(manager, routing, solution, num_routes):
 
 def get_vehicle_capacities():
     vehicles = database.child('Vehicle').get().val()
-    print(vehicles)
+    print('Vehicles',vehicles)
     vehicle_cap = []
     vehicle_key = []
     for i in vehicles:
-        vehicle_cap.append(vehicles[i]['capacity'])
+        vehicle_cap.append(int(vehicles[i]['capacity']))
         vehicle_key.append(i)
+    print("Vehicle Cap",vehicle_cap)
     return vehicle_cap,vehicle_key
 
 def get_bin_cap():
     bins = database.child('Bin').get().val()
-    print(bins)
+    print('Bins',bins)
     bin_cap = []
-    vehicle_key = []
     for i in bins:
-        bin_cap.append(bins[i]['capacity'])
-    print(bin_cap)
+        bin_cap.append(int(bins[i]['capcity']))
+    print("Bin Cap",bin_cap)
     return bin_cap
+    #a = [0, 1, 1, 4, 4, 2, 4, 8, 8, 1, 2, 1, 2, 4, 4, 8, 8]
+   # return bin_cap
 
 def get_bin_address():
     bin_addr = []
     bins = database.child('Bin').get().val()
+    binVal = database.child('Bin').get().key()
     print(bins)
+    #bins = bins.remove(0)
     for i in bins:
         s = ""
         s = str(bins[i]['latitude'])+","+str(bins[i]['longitude'])
@@ -332,7 +395,7 @@ def generate_routes(request):
     #                      '19.3834291,72.8280696',
     #                      '19.3834291,72.8280696',
     #                      '19.2813741,72.8559049',
-    #                      '19.2813741,72.8559049',
+    #                      '19.2527913,72.8506576',
     #                      '19.2813741,72.8559049',
     #                      '19.2864772,72.8486726',
     #                      '19.2794676,72.8775643',
@@ -343,34 +406,43 @@ def generate_routes(request):
     #                      '19.3720507,72.8268628',
     #                      '19.3720419,72.8268988',
     #                      ]
-    data['addresses'] = get_bin_address()
+    data['addresses'] = ['19.8597909,75.3091889']
+    data['addresses']  = data['addresses'] + get_bin_address()
+    print("addr",data['addresses'])
     """Solve the CVRP problem."""
 
     """Stores the data for the problem."""
     datap = {}
-    # datap['distance_matrix'] = create_distance_matrix(data)
-    datap['distance_matrix'] = [
-        [0, 31895, 878, 31603, 31603, 5342, 5342, 5342, 3010, 5834, 33590, 33590, 33590, 33821, 33821, 33821],
-        [32453, 0, 32024, 999, 999, 29059, 29059, 29059, 31272, 26481, 2985, 2985, 2985, 3217, 3217, 3217],
-        [878, 32094, 0, 31803, 31803, 4913, 4913, 4913, 2581, 6033, 33789, 33789, 33789, 34020, 34020, 34020],
-        [32453, 1359, 32023, 0, 0, 29058, 29058, 29058, 31271, 26480, 1986, 1986, 1986, 2218, 2218, 2218],
-        [32453, 1359, 32023, 0, 0, 29058, 29058, 29058, 31271, 26480, 1986, 1986, 1986, 2218, 2218, 2218],
-        [5258, 29590, 4828, 29298, 29298, 0, 0, 0, 4076, 3026, 31285, 31285, 31285, 31516, 31516, 31516],
-        [5258, 29590, 4828, 29298, 29298, 0, 0, 0, 4076, 3026, 31285, 31285, 31285, 31516, 31516, 31516],
-        [5258, 29590, 4828, 29298, 29298, 0, 0, 0, 4076, 3026, 31285, 31285, 31285, 31516, 31516, 31516],
-        [3481, 31233, 3052, 30942, 30942, 4052, 4052, 4052, 0, 5172, 32928, 32928, 32928, 33160, 33160, 33160],
-        [5972, 26678, 5543, 26387, 26387, 2577, 2577, 2577, 4791, 0, 28373, 28373, 28373, 28605, 28605, 28605],
-        [34313, 2611, 33883, 2294, 2294, 30918, 30918, 30918, 33131, 28340, 0, 0, 0, 511, 511, 511],
-        [34313, 2611, 33883, 2294, 2294, 30918, 30918, 30918, 33131, 28340, 0, 0, 0, 511, 511, 511],
-        [34313, 2611, 33883, 2294, 2294, 30918, 30918, 30918, 33131, 28340, 0, 0, 0, 511, 511, 511],
-        [34219, 2517, 33789, 2200, 2200, 30824, 30824, 30824, 33037, 28247, 511, 511, 511, 0, 0, 0],
-        [34219, 2517, 33789, 2200, 2200, 30824, 30824, 30824, 33037, 28247, 511, 511, 511, 0, 0, 0],
-        [34219, 2517, 33789, 2200, 2200, 30824, 30824, 30824, 33037, 28247, 511, 511, 511, 0, 0, 0],
-    ]
-    # datap['demands'] = [0, 1, 1, 4, 4, 2, 4, 8, 8, 1, 2, 1, 2, 4, 4, 8, 8]
-    datap['demands'] = get_bin_cap()
+    datap['distance_matrix'] = create_distance_matrix(data)
+    print("dm", datap['distance_matrix'])
+
+    # datap['distance_matrix'] = [
+    #     [0, 31895, 878, 31603, 31603, 5342, 5342, 5342, 3010, 5834, 33590, 33590, 33590, 33821, 33821, 33821],
+    #     [32453, 0, 32024, 999, 999, 29059, 29059, 29059, 31272, 26481, 2985, 2985, 2985, 3217, 3217, 3217],
+    #     [878, 32094, 0, 31803, 31803, 4913, 4913, 4913, 2581, 6033, 33789, 33789, 33789, 34020, 34020, 34020],
+    #     [32453, 1359, 32023, 0, 0, 29058, 29058, 29058, 31271, 26480, 1986, 1986, 1986, 2218, 2218, 2218],
+    #     [32453, 1359, 32023, 0, 0, 29058, 29058, 29058, 31271, 26480, 1986, 1986, 1986, 2218, 2218, 2218],
+    #     [5258, 29590, 4828, 29298, 29298, 0, 0, 0, 4076, 3026, 31285, 31285, 31285, 31516, 31516, 31516],
+    #     [5258, 29590, 4828, 29298, 29298, 0, 0, 0, 4076, 3026, 31285, 31285, 31285, 31516, 31516, 31516],
+    #     [5258, 29590, 4828, 29298, 29298, 0, 0, 0, 4076, 3026, 31285, 31285, 31285, 31516, 31516, 31516],
+    #     [3481, 31233, 3052, 30942, 30942, 4052, 4052, 4052, 0, 5172, 32928, 32928, 32928, 33160, 33160, 33160],
+    #     [5972, 26678, 5543, 26387, 26387, 2577, 2577, 2577, 4791, 0, 28373, 28373, 28373, 28605, 28605, 28605],
+    #     [34313, 2611, 33883, 2294, 2294, 30918, 30918, 30918, 33131, 28340, 0, 0, 0, 511, 511, 511],
+    #     [34313, 2611, 33883, 2294, 2294, 30918, 30918, 30918, 33131, 28340, 0, 0, 0, 511, 511, 511],
+    #     [34313, 2611, 33883, 2294, 2294, 30918, 30918, 30918, 33131, 28340, 0, 0, 0, 511, 511, 511],
+    #     [34219, 2517, 33789, 2200, 2200, 30824, 30824, 30824, 33037, 28247, 511, 511, 511, 0, 0, 0],
+    #     [34219, 2517, 33789, 2200, 2200, 30824, 30824, 30824, 33037, 28247, 511, 511, 511, 0, 0, 0],
+    #     [34219, 2517, 33789, 2200, 2200, 30824, 30824, 30824, 33037, 28247, 511, 511, 511, 0, 0, 0],
+    # ]
+    #datap['demands'] = [0, 1, 1, 4, 4, 2, 4, 8, 8, 1, 2, 1, 2, 4, 4, 8, 8]
+    datap['demands'] = [0]
+    datap['demands'] = datap['demands']+ get_bin_cap()
+    print("demands", datap['demands'])
+    #datap['vehicle_capacities'], datap['vehicle_key'] = [15,15,15,15],[1,2,3,4]
     datap['vehicle_capacities'],datap['vehicle_key'] = get_vehicle_capacities()
+    print("veh_cap", datap['vehicle_capacities'])
     datap['num_vehicles'] = len(datap['vehicle_capacities'])
+    print("n", datap['num_vehicles'])
     datap['depot'] = 0
 
 
@@ -378,7 +450,7 @@ def generate_routes(request):
     manager = pywrapcp.RoutingIndexManager(len(datap['distance_matrix']),
                                            datap['num_vehicles'], datap['depot'])
 
-    print(datap['distance_matrix'][1][1])
+
     # Create Routing Model.
     routing = pywrapcp.RoutingModel(manager)
 
@@ -420,11 +492,11 @@ def generate_routes(request):
 
     # Solve the problem.
     assignment = routing.SolveWithParameters(search_parameters)
-    #     solution = routing.SolveWithParameters(search_parameters)
-
+        # solution = routing.SolveWithParameters(search_parameters)
+    print('ASSIGNMENT:',assignment)
     # Print solution on console.
     if assignment:
-        #         print_solution(data, manager, routing, assignment)
+        # print_solution(data, manager, routing, assignment)
         routes = get_routes(manager, routing, assignment, datap['num_vehicles'])
         # Display the routes.
         Routes = []
@@ -449,8 +521,37 @@ def generate_routes(request):
                 "longitude": long
             }
         print(d)
-        database.child('Route').child(i).set(d)
+        sdate = str(date.today())
+        st = str(datetime.time(datetime.now()))
+        stime = (st[0:5])
+        database.child('Route').child(sdate).child(stime).child(i).set(d)
         j = j+1
     print(vehicle_route)
+    truckRoutes = []
+    #<I love this code>
+    for key,val in vehicle_route.items():
+        print("Key",key)
+        for xy in val:
+            x = xy[0]
+            y = xy[1]
+            print(x,y)
+    #</I love this code>
+    # test = [ [k,v] for k, v in vehicle_route.items() ]
+    # print(test)
+    test = json.dumps(vehicle_route)
+    return render(request,'generatedRoutes.html',{'route':test,'veh1': datap['vehicle_key'][0]})
 
-    return render(request,'generatedRoutes.html')
+
+
+
+
+
+
+
+
+
+
+
+
+def real_time(request):
+    return render(request,'realTime.html')
