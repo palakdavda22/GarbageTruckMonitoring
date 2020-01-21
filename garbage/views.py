@@ -603,12 +603,19 @@ def generate_routes(request):
 
 
 def real_time(request):
-    return render(request,'realTime.html')
+    date = datetime.now().strftime("%Y-%m-%d")
+
+    return render(request,'realTime.html',{'date':date})
 
 
 
 
 
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> 6b566bb979e9f74198649b07c14cddca95d51c70
 def show_vehicles(request):
     vehicles = database.child('Vehicle').get().val()
     print(vehicles)
@@ -631,13 +638,17 @@ def g_routes(request,vId):
     print(routes)
     return render(request,'showRoutes.html',{'route' :routes,'vId':vId})
 
+<<<<<<< HEAD
 import datetime
+=======
+# import datetime
+>>>>>>> 6b566bb979e9f74198649b07c14cddca95d51c70
 
 def updateFeedback(request):
 
     comment = request.POST.get('feedback')
     id =request.POST.get('id')
-    date = datetime.datetime.now().strftime("%Y:%m:%d:%H:%M:%S")
+    date = datetime.now().strftime("%Y:%m:%d:%H:%M:%S")
     # console.log()
     print(comment, "------", id ,"------", date)
     data = {

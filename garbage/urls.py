@@ -40,4 +40,4 @@ urlpatterns = [
     path('updateFeedback/', views.updateFeedback, name="updateFeedback")
     path('g-routes/<int:vId>/', views.g_routes),
 
-]
+];

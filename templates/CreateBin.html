@@ -15,7 +15,7 @@
 
 <button type="button" onclick="location.href='{% url 'log' %}'">Logout</button>
     </div>
-<H2>Create Daily Progress Report</H2>
+<H2>Create Bin</H2>
 <form action="/post_create_bin/" method="post">
     {% csrf_token %}
     Latitude :
@@ -25,6 +25,7 @@
 	Capacity:
 	<input type="text" name="capacity" required><br><br>
     <br><br>
+    Height:
     <input type="text" name="height" required><br><br>
     <br><br>
     <input type="submit" value="Submit">

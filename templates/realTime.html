@@ -79,7 +79,6 @@
                 console.log(data.val().latitude,  uluru.lng)
                 var marker = new google.maps.Marker({
                     position: uluru,
-                    icon: "bin.png",
                     map: map
                 });
 
@@ -88,7 +87,8 @@
             }
 
             // get firebase database reference...
-            var cars_Ref = firebase.database().ref('DriverLocation/2020-01-11/1');
+
+            var cars_Ref = firebase.database().ref('RealTimeMonitoring/' +"2020-01-17" + "/");
             console.log(cars_Ref)
             // this event will be triggered when a new object will be added in the database...
             cars_Ref.on('child_added', function (data) {
