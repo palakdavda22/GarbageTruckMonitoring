@@ -25,13 +25,18 @@ urlpatterns = [
     url(r'^logout/',views.logout,name="log"),
     url(r'^createbin/',views.create_bin,name='create_bin'),
     url(r'^post_create_bin/',views.post_create_bin,name='post_create_bin'),
+    url(r'^createdepot/',views.create_depot,name='create_depot'),
+    url(r'^post_create_depot/',views.post_create_depot,name='post_create_depot'),
     url(r'^createdriver/',views.create_driver,name='create_driver'),
     url(r'^post_create_driver/', views.post_create_driver, name="post_create_driver" ),
     url(r'^check/',views.check,name='check'),
     url(r'^check_queries/', views.check_queries, name='check_queries'),
+    url(r'^showvehicles/', views.show_vehicles, name = 'routes'),
     url(r'^generateroutes/', views.generate_routes, name = 'routes'),
     url(r'^createvehicle/', views.create_vehicle, name = 'vehicles'),
     url(r'^post_create_vehicle/',views.post_create_vehicle,name='post_create_vehicle'),
     url(r'^real_time/',views.real_time,name='real_time'),
-    url(r'^latlong/',views.get_latlong,name = "latlong")
+    url(r'^latlong/',views.get_latlong,name = "latlong"),
+    path('g-routes/<int:vId>/', views.g_routes),
+
 ]
