@@ -611,11 +611,6 @@ def real_time(request):
 
 
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 6b566bb979e9f74198649b07c14cddca95d51c70
 def show_vehicles(request):
     vehicles = database.child('Vehicle').get().val()
     print(vehicles)
@@ -638,11 +633,7 @@ def g_routes(request,vId):
     print(routes)
     return render(request,'showRoutes.html',{'route' :routes,'vId':vId})
 
-<<<<<<< HEAD
-import datetime
-=======
 # import datetime
->>>>>>> 6b566bb979e9f74198649b07c14cddca95d51c70
 
 def updateFeedback(request):
 
