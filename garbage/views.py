@@ -132,6 +132,33 @@ def post_create_bin(request):
     name = "vinal"
     return render(request,'welcome.html', {'e':name})
 
+def create_depot(request):
+    return render(request,'CreateDepot.html')
+
+def post_create_depot(request):
+    lat = str(request.POST.get('lat'))
+    lon = str(request.POST.get('lon'))
+    lat = lat.replace(".","-")
+    lon = lon.replace(".", "-")
+    id = lat + "|" + lon
+    lat = lat.replace("-", ".")
+    lon = lon.replace("-", ".")
+    print(id)
+    idtoken= request.session['uid']
+    a = authe.get_account_info(idtoken)
+    a = a['users']
+    a = a[0]
+    a = a['localId']
+
+    data = {
+        "latitude":lat,
+        'longitude':lon,
+    }
+    database.child('Depot').child(id).set(data)
+    # name = database.child('users').child(id).child('details').child('name').get().val()
+    name = "vinal"
+    return render(request,'welcome.html', {'e':name})
+
 
 def create_vehicle(request):
     return render(request, 'CreateVehicle.html')
@@ -272,7 +299,7 @@ def check_queries(request):
         for j in data:
             date_wise[0].append(data)
             count+=1
-    
+
     citizen_details.sort(reverse=True)
     print(date_wise)
 
@@ -283,8 +310,8 @@ def check_queries(request):
     query = []
     date = []
     for key,value in citizendetails.items():
-        
-        
+
+
         for keysecond,valuesecond in value.items():
             print(keysecond)
             citizen_id.append(key)
@@ -293,9 +320,9 @@ def check_queries(request):
             address.append(valuesecond['address'])
             name.append(valuesecond['name'])
             query.append(valuesecond['query'])
-            
-  
-           
+
+
+
     comb_lis_query = list(zip(name,address,query,date,citizen_id))
 
     return render(request,'checkQueries.html',{'comb_lis_query':comb_lis_query})
@@ -399,6 +426,16 @@ def get_bin_address():
     print(bin_addr)
     return bin_addr
 
+def get_depot_location():
+    depot = database.child('Depot').get().val()
+    print("DepotNew: ",depot)
+    depotarr = []
+    s = ""
+    for i in depot:
+        s = str(depot[i]['latitude']) + "," + str(depot[i]['longitude'])
+    depotarr.append(s)
+    return depotarr
+
 def generate_routes(request):
     data = {}
     data['API_key'] = 'AIzaSyA3W-x4zqHwfCJ2xgzLvuO1MVPlWwp_XJI'
@@ -419,7 +456,8 @@ def generate_routes(request):
     #                      '19.3720507,72.8268628',
     #                      '19.3720419,72.8268988',
     #                      ]
-    data['addresses'] = ['19.8597909,75.3091889']
+    # data['addresses'] = ['19.8597909,75.3091889']
+    data['addresses'] = get_depot_location()
     data['addresses']  = data['addresses'] + get_bin_address()
     print("addr",data['addresses'])
     """Solve the CVRP problem."""
@@ -552,8 +590,12 @@ def generate_routes(request):
     # test = [ [k,v] for k, v in vehicle_route.items() ]
     # print(test)
     test = json.dumps(vehicle_route)
-    return render(request,'generatedRoutes.html',{'route':test,'veh1': datap['vehicle_key'][0]})
-
+    vehicles = database.child('Vehicle').get().val()
+    print(vehicles)
+    vehicleId = []
+    for i in vehicles:
+        vehicleId.append(int(i))
+    return render(request,'generatedRoutes_copy.html',{'route':test,'veh1': datap['vehicle_key'][0],'vehicleId':vehicleId})
 
 
 
@@ -563,7 +605,33 @@ def generate_routes(request):
 def real_time(request):
     return render(request,'realTime.html')
 
-import datetime 
+
+
+
+
+def show_vehicles(request):
+    vehicles = database.child('Vehicle').get().val()
+    print(vehicles)
+    vehicleId = []
+    for i in vehicles:
+        vehicleId.append(int(i))
+    return render(request,'showVehicles.html',{'vehicleId':vehicleId})
+
+def g_routes(request,vId):
+    print(vId)
+    sdate = str(date.today())
+    p = database.child('Route').child(sdate).get().val()
+    print("P",p)
+    lastIndex = ""
+    for i in p:
+        lastIndex = i
+        print(i)
+    j = p[lastIndex][str(vId)]
+    routes = json.dumps(j)
+    print(routes)
+    return render(request,'showRoutes.html',{'route' :routes,'vId':vId})
+
+import datetime
 
 def updateFeedback(request):
 
@@ -574,7 +642,7 @@ def updateFeedback(request):
     print(comment, "------", id ,"------", date)
     data = {
         "feedback":comment,
-        
+
     }
     # current = date.year-date.month-date.day,"-",date.hour,"-",date.minute,"-",date.second
     print(date)

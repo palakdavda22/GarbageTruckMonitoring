@@ -24,13 +24,15 @@
 <h1>Routes</h1>
 <p>{{ route }}</p>
 <div id="map-canvas" style="width: 500px; height: 400px;"></div>
-<button id="get">Generate Routes</button>
+<a href="/showvehicles/"><button>Vehicle Wise Routes</button></a>
 
 <script>
     var stepDisplay;
-    var resultGlobal = [];
 
-    var dirDisplay = new google.maps.DirectionsRenderer();
+
+
+
+
     var dirService = new google.maps.DirectionsService();
     var map;
     var allLongLat = {{ route |safe|escape}};
@@ -43,16 +45,19 @@
     map =  new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
 
     stepDisplay = new google.maps.InfoWindow();
-    dirDisplay.setMap(map);
 
     let markersArray = [];
     function calRoute(listener) {
-
+        var index = 0;
         var request = [];
+        var geocodedArr = ['e'];
+        var routesArr = ['f'];
         for (var key in allLongLat) {
-            {#   for (i = 0; i < markersArray.length; i++) {#}
-            {#       markersArray[i].setMap(null);#}
-            //}
+
+
+               for (i = 0; i < markersArray.length; i++) {
+                   markersArray[i].setMap(null);
+            }
             var value = allLongLat[key];
             {#console.log(value);#}
             {#console.log(value[value.length - 1]);#}
@@ -81,79 +86,37 @@
                 'travelMode': 'DRIVING',
                 'waypoints': waypts,
             };
+            var rendererOptions = {
+                preserveViewport: true,
+                supressmarkers:false,
+                //routeIndex:index
+            };
+            index = index + 1;
+             var dirDisplay = new google.maps.DirectionsRenderer(rendererOptions);
+             dirDisplay.setMap(map);
+
 
             dirService.route(request, function (result, status) {
                     if (status == 'OK') {
-                        //resultGlobal.push(result);
-                        dirDisplay.setDirections(result);
+                       dirDisplay.setDirections(result);
+                       //console.log(result.geocoded_waypoints);
+                        {#var a = result.geocoded_waypoints;#}
+                        {#geocodedArr.concat(a);#}
+                        {#routesArr.concat(result.routes);#}
+                        {#console.log(geocodedArr);#}
+                        {#console.log(routesArr);#}
+                        {#//console.log(result);#}
+
                     }
-                    //showSteps(result);
+
                 }
             );
         }
 
-
-        {#function showSteps(directionResult) {#}
-        {#  var myRoute = directionResult.routes[0].legs[0];#}
-        {##}
-        {#  for (var i = 0; i < myRoute.steps.length; i++) {#}
-        {#      var marker = new google.maps.Marker({#}
-        {#        position: myRoute.steps[i].start_point,#}
-        {#        map: map#}
-        {#      });#}
-        {#      attachInstructionText(marker, myRoute.steps[i].instructions);#}
-        {#      markerArray[i] = marker;#}
-        {#  }#}
-        //}
-
-        {#function attachInstructionText(marker, text) {#}
-        {#  google.maps.event.addListener(marker, 'click', function () {#}
-        {#      stepDisplay.setContent(text);#}
-        {#      stepDisplay.open(map, marker);#}
-        {#  });#}
-        //}
-    }
-    function showDirections(){
-        for(var i=0;i<resultGlobal.length;i++){
-            dirDisplay.setDirections(resultGlobal[i]);
-            //renderDirectionsPolylines(resultGlobal[i]);
-        }
+        var resultGlobal = {"geocoded_waypoints":geocodedArr,"routes":routesArr,"status":"OK"};
+        //dirDisplay.setDirections(resultGlobal);
 
     }
-    var polylineOptions = {
-      strokeColor: '#C83939',
-      strokeOpacity: 1,
-      strokeWeight: 4
-    };
-    var colors = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF"];
-    var polylines = [];
-    function renderDirectionsPolylines(response) {
-      var bounds = new google.maps.LatLngBounds();
-      for (var i = 0; i < polylines.length; i++) {
-        polylines[i].setMap(null);
-      }
-      var legs = response.routes[0].legs;
-      console.log(legs);
-      for (i = 0; i < legs.length; i++) {
-        var steps = legs[i].steps;
-        for (j = 0; j < steps.length; j++) {
-          var nextSegment = steps[j].path;
-          var stepPolyline = new google.maps.Polyline(polylineOptions);
-          stepPolyline.setOptions({
-            strokeColor: colors[i]
-          });
-            stepPolyline.getPath().push(nextSegment);
-            bounds.extend(nextSegment);
-
-          polylines.push(stepPolyline);
-          stepPolyline.setMap(map);
-        }
-      }
-      map.fitBounds(bounds);
-    }
-
-
-
 
     function addMarker(latLng, color) {
           let url = "http://maps.google.com/mapfiles/ms/icons/";
@@ -171,7 +134,7 @@
         }
     document.getElementById('get').onclick = function () {
         calRoute();
-        showDirections();
+        {#showDirections();#}
     };
 
 
