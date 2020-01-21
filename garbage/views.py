@@ -631,13 +631,13 @@ def g_routes(request,vId):
     print(routes)
     return render(request,'showRoutes.html',{'route' :routes,'vId':vId})
 
-import datetime
+# import datetime
 
 def updateFeedback(request):
 
     comment = request.POST.get('feedback')
     id =request.POST.get('id')
-    date = datetime.datetime.now().strftime("%Y:%m:%d:%H:%M:%S")
+    date = datetime.now().strftime("%Y:%m:%d:%H:%M:%S")
     # console.log()
     print(comment, "------", id ,"------", date)
     data = {
