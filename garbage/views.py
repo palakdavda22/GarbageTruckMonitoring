@@ -46,24 +46,37 @@ def postsign(request):
 def logout(request):
     auth.logout(request)
     return render(request,'sign.html')
+from django.shortcuts import render
+from django.contrib import auth
+import json
 
+import pyrebase
+
+from datetime import date
 
 def get_latlong(request) :
-    # db = firebase.database()
-    # bin = db.child("Bin").get().val()
-    # lat,lon = [],[]
-    # print(bin)
-    # for i in bin :
-    #
-    #     lat.append(float(db.child("Bin").child(i).child("latitude").get().val()))
-    #     lon.append(float(db.child("Bin").child(i).child("longitude").get().val()))
-    # print(lat,lon)
-    # lat = json.dumps(lat)
-    # lon = json.dumps(lon)
-    # return render(request,"latlongmap.html",{"lat":lat,"lon":lon})
+    from django.shortcuts import render
+    from django.contrib import auth
+
+    import json
+
+    import pyrebase
+
+    config = {
+        'apiKey': "AIzaSyB6s7DSe9M6MZk7g77cMTuoqIO6d-ebKwI",
+        'authDomain': "garbage-truck-monitoring.firebaseapp.com",
+        'databaseURL': "https://garbage-truck-monitoring.firebaseio.com",
+        'projectId': "garbage-truck-monitoring",
+        'storageBucket': "garbage-truck-monitoring.appspot.com",
+        'messagingSenderId': "549306067582",
+        'appId': "1:549306067582:web:bbaeac9ec829045099c62f",
+        'measurementId': "G-X9JCRW3TR0"
+    }
+    firebase = pyrebase.initialize_app(config)
 
     db = firebase.database()
     bin = db.child("Bin").get().val()
+    bin2 = db.child("BinPerLevel").get().val()
     lat, lon, cap = [], [], []
     cap_70, cap_20, cap_20_70 = [], [], []
     print(bin)
@@ -71,31 +84,29 @@ def get_latlong(request) :
         height = (int(db.child("Bin").child(i).child("height").get().val()))
         lati = (float(db.child("Bin").child(i).child("latitude").get().val()))
         long = (float(db.child("Bin").child(i).child("longitude").get().val()))
-
-        var = db.child("BinPerLevel").child('19-312251|72-8513579').child("2020-01-12").get().val()
-        print(next(reversed(var)))
-        height2 = db.child("BinPerLevel").child('19-312251|72-8513579').child("2020-01-12").child(
-            next(reversed(var))).child(
-            "height").get().val()
-
-        # for i in var :
-        #     print(i)
-        # from datetime import date, datetime
-        # today = date.today()
-        # now = datetime.now()
-        # dt_string = now.strftime("%H:%M")
-        # height2 = (int(db.child("BinPerLevel").child(data).child("height").get().val()))
-        perc = (int(height2) / height) * 100
-        if perc >= 70:
-            cap_70.append([lati, long])
-        elif perc <= 20:
-            cap_20.append([lati, long])
-        else:
-            cap_20_70.append([lati, long])
+        print(i)
+        try :
+            data = db.child("BinPerLevel").child(i).child("2020-01-21").get().val()
+            last = next(reversed(data))
+            height2 = db.child("BinPerLevel").child(i).child("2020-01-21").child(last).child("height").get().val()
+            perc = (int(height2) / int(height)) * 100
+            if perc >= 70:
+                cap_70.append([lati, long])
+            elif perc <= 20:
+                cap_20.append([lati, long])
+            else:
+                cap_20_70.append([lati, long])
+        except:
+            pass
     cap_20 = json.dumps(cap_20)
     cap_20_70 = json.dumps(cap_20_70)
     cap_70 = json.dumps(cap_70)
-    return render(request, 'latlong.html', {"cap_20": cap_20, "cap_70": cap_70, "cap_20_70": cap_20_70})
+    print(cap_70)
+    print(cap_20_70)
+    print(cap_20)
+
+    # return render(request, 'neww.html',{"cap_70":cap_70,"cap_20_70":cap_20_70,"cap_20":cap_20})
+    return render(request, 'latlong.html', {"cap_70": cap_70, "cap_20_70": cap_20_70, "cap_20": cap_20})
 
 def create_bin(request):
 
@@ -607,8 +618,8 @@ def generate_routes(request):
 
 def real_time(request):
     date = datetime.now().strftime("%Y-%m-%d")
-
-    return render(request,'realTime.html',{'date':date})
+    print("******************" , date)
+    return render(request,'realTime.html',{'dates':date})
 
 
 
