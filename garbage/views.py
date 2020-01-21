@@ -603,7 +603,9 @@ def generate_routes(request):
 
 
 def real_time(request):
-    return render(request,'realTime.html')
+    date = datetime.now().strftime("%Y-%m-%d")
+
+    return render(request,'realTime.html',{'date':date})
 
 
 
