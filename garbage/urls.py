@@ -33,5 +33,7 @@ urlpatterns = [
     url(r'^createvehicle/', views.create_vehicle, name = 'vehicles'),
     url(r'^post_create_vehicle/',views.post_create_vehicle,name='post_create_vehicle'),
     url(r'^real_time/',views.real_time,name='real_time'),
-    url(r'^latlong/',views.get_latlong,name = "latlong")
+    url(r'^latlong/',views.get_latlong,name = "latlong"),
+    path('updateFeedback/',views.updateFeedback,name = "updateFeedback")
+
 ]
