@@ -15,11 +15,11 @@
 
 <button type="button" onclick="location.href='{% url 'log' %}'">Logout</button>
     </div>
-<H2>Create Daily Progress Report</H2>
+<H2>Create Driver</H2>
 <form action="/post_create_driver/" method="post">
 	{% csrf_token %}
-	Aadhar ID :
-    <input type="text" name="aadhar" required><br><br>
+	Mobile No :
+    <input type="text" name="mobile" required><br><br>
     Name :
     <input type="text" name="name" required><br><br>
     Address :
@@ -28,6 +28,8 @@
 	<input type="text" name="gender" required><br><br>
 	Age:
 	<input type="text" name="age" required><br><br>
+    Password:
+    <input type="text" name="password" required><br><br>
 	Joining Date:
 	<input type="text" name="joiningdate" required><br><br>
     <br><br>

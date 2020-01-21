@@ -189,30 +189,31 @@ def create_driver(request):
 	return render(request, 'CreateDriver.html')
 
 def post_create_driver(request):
-	name = request.POST.get('name')
-	age =request.POST.get('age')
-	address =request.POST.get('address')
-	gender =request.POST.get('gender')
-	date =request.POST.get('joiningdate')
-	aadhar = str(name) + str(date)
+    mobileNo = request.POST.get('mobile')
+    name = request.POST.get('name')
+    age =request.POST.get('age')
+    address =request.POST.get('address')
+    gender =request.POST.get('gender')
+    password = request.POST.get('password')
+    date =request.POST.get('joiningdate')
+    idtoken= request.session['uid']
+    a = authe.get_account_info(idtoken)
+    a = a['users']
+    a = a[0]
+    a = a['localId']
 
-	idtoken= request.session['uid']
-	a = authe.get_account_info(idtoken)
-	a = a['users']
-	a = a[0]
-	a = a['localId']
 
-
-	data = {
+    data = {
         "name":name,
         'age':age,
-		'gender': gender,
-		'address':address,
-		'joining date': date
+        'gender': gender,
+        'address':address,
+        'joining date': date,
+        'password': password
     }
-	database.child('Driver').child(aadhar).set(data)
-	name = database.child('users').child(id).child('details').child('name').get().val()
-	return render(request,'welcome.html', {'e':name})
+    database.child('Driver').child(mobileNo).set(data)
+    name = database.child('users').child(id).child('details').child('name').get().val()
+    return render(request,'welcome.html', {'e':name})
 
 
 def check(request):
@@ -558,6 +559,8 @@ def generate_routes(request):
                 Route.append(data['addresses'][route[j]].split(","))
             Routes.append(Route)
         print(Routes)
+    else:
+        return render(request,'routesError.html')
 
     vehicle_route = dict()
     j = 0
