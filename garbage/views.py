@@ -285,34 +285,47 @@ def check(request):
 
 def check_queries(request):
     citizendetails = database.child('Citizen').get().val()
+    print(citizendetails)
     citizen_details=[]
-    for i in citizendetails:
 
+    for i in citizendetails:
         citizen_details.append(i)
 
-    citizen_details.sort(reverse=True)
+    date_wise = []
+    for i in citizen_details:
+        date_wise.append([])
+        data = database.child('Citizen').child(i).get().val()
+        count = 0
+        for j in data:
+            date_wise[0].append(data)
+            count+=1
 
+    citizen_details.sort(reverse=True)
+    print(date_wise)
+
+    citizen_id = []
     address = []
     image = []
     name = []
     query = []
-
-    for i in citizen_details:
-
-        addr=database.child('Citizen').child(i).child('address').get().val()
-        address.append(addr)
-        img=database.child('Citizen').child(i).child('image').get().val()
-        image.append(img)
-        que=database.child('Citizen').child(i).child('query').get().val()
-        query.append(que)
-        n=database.child('Citizen').child(i).child('name').get().val()
-        name.append(n)
+    date = []
+    for key,value in citizendetails.items():
 
 
-    comb_lis_query = zip(name,address,query,image)
+        for keysecond,valuesecond in value.items():
+            print(keysecond)
+            citizen_id.append(key)
+            date.append(keysecond)
+            print(date)
+            address.append(valuesecond['address'])
+            name.append(valuesecond['name'])
+            query.append(valuesecond['query'])
 
 
-    return render(request,'checkQueries.html',{'comb_lis_query':comb_lis_query,'e':"Palak"})
+
+    comb_lis_query = list(zip(name,address,query,date,citizen_id))
+
+    return render(request,'checkQueries.html',{'comb_lis_query':comb_lis_query})
 
 def create_distance_matrix(data):
     addresses = data["addresses"]
@@ -589,12 +602,6 @@ def generate_routes(request):
 
 
 
-
-
-
-
-
-
 def real_time(request):
     return render(request,'realTime.html')
 
@@ -623,3 +630,21 @@ def g_routes(request,vId):
     routes = json.dumps(j)
     print(routes)
     return render(request,'showRoutes.html',{'route' :routes,'vId':vId})
+
+import datetime
+
+def updateFeedback(request):
+
+    comment = request.POST.get('feedback')
+    id =request.POST.get('id')
+    date = datetime.datetime.now().strftime("%Y:%m:%d:%H:%M:%S")
+    # console.log()
+    print(comment, "------", id ,"------", date)
+    data = {
+        "feedback":comment,
+
+    }
+    # current = date.year-date.month-date.day,"-",date.hour,"-",date.minute,"-",date.second
+    print(date)
+    database.child('Feedback').child(id).child(date).set(data)
+    return render(request,'welcome.html', {'e':"palak   "})
