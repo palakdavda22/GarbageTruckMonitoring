@@ -64,9 +64,9 @@
             var map;
             function initMap() { // Google Map Initialization... 
                 map = new google.maps.Map(document.getElementById('map'), {
-                    zoom: 16,
-                    center: new google.maps.LatLng(19.3458748, 72.80322774),
-                    mapTypeId: 'terrain'
+                    zoom: 10,
+                    center: new google.maps.LatLng(19.2140407, 72.9312477),
+
                 });
             }
 
@@ -88,7 +88,8 @@
 
             // get firebase database reference...
 
-            var cars_Ref = firebase.database().ref('RealTimeMonitoring/' + {{ date }} + "/");
+            var cars_Ref = firebase.database().ref('RealTimeMonitoring/' + "2020-01-17" + "/");
+            {#var cars_Ref = firebase.database().ref('RealTimeMonitoring/' + {{ date }} + "/");#}
             console.log(cars_Ref)
             // this event will be triggered when a new object will be added in the database...
             cars_Ref.on('child_added', function (data) {
