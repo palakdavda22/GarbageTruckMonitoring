@@ -42,10 +42,8 @@
                 {
                     position: new google.maps.LatLng(cap_20[i][0], cap_20[i][1]),
                     map: map,
-                    {#icon: "{% static 'admin/img/red_bin.jpeg' %}"#}
-                    icon : "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                    icon: "{% static 'img/red_bin (2).jpg' %}"
                 });
-                
             }
 
                  for (i = 0; i < cap_20_70.length; i++)
@@ -54,27 +52,24 @@
                 {
                     position: new google.maps.LatLng(cap_20_70[i][0], cap_20_70[i][1]),
                     map: map,
-                    {#icon: "{% static 'admin/img/green_bin.jpeg' %}"#}
-                    icon : "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                    icon: "{% static 'img/green_bin.jpg' %}"
                 });
             }
 
          for (i = 0; i < cap_70.length; i++)
-            { console.log(cap_70[i][0], cap_70[i][1]);
+            { console.log(cap_70[i][0], cap_70[i][1])
                 marker = new google.maps.Marker(
                 {
                     position: new google.maps.LatLng(cap_70[i][0], cap_70[i][1]),
                     map: map,
-                    {#//icon: "{% static 'admin/img/yellow_bin.jpeg' %}"#}
-                    icon : "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
+                    icon: "{% static 'img/WhatsApp Image 2020-01-13 at 5.35.31 PM.jpg' %}"
                 });
             }
 
      }
 
 </script>
-
-    <script async defer
+   <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB6s7DSe9M6MZk7g77cMTuoqIO6d-ebKwI&callback=initMap">
 
     </script>
