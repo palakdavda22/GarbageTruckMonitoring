@@ -710,11 +710,8 @@ def generate_routes(request):
 
 def real_time(request):
     date = datetime.now().strftime("%Y-%m-%d")
-    print("******************" , date)
-    return render(request,'realTime.html',{'dates':date})
 
-
-
+    return render(request,'realTime.html',{'date':date})
 
 
 def show_vehicles(request):
