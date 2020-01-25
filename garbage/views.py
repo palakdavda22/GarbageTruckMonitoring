@@ -108,6 +108,98 @@ def get_latlong(request) :
     # return render(request, 'neww.html',{"cap_70":cap_70,"cap_20_70":cap_20_70,"cap_20":cap_20})
     return render(request, 'latlong.html', {"cap_70": cap_70, "cap_20_70": cap_20_70, "cap_20": cap_20})
 
+
+def get_latlong2(request) :
+   """
+    from django.shortcuts import render
+    from django.contrib import auth
+
+    import json
+
+    import pyrebase
+
+    config = {
+        'apiKey': "AIzaSyB6s7DSe9M6MZk7g77cMTuoqIO6d-ebKwI",
+        'authDomain': "garbage-truck-monitoring.firebaseapp.com",
+        'databaseURL': "https://garbage-truck-monitoring.firebaseio.com",
+        'projectId': "garbage-truck-monitoring",
+        'storageBucket': "garbage-truck-monitoring.appspot.com",
+        'messagingSenderId': "549306067582",
+        'appId': "1:549306067582:web:bbaeac9ec829045099c62f",
+        'measurementId': "G-X9JCRW3TR0"
+    }
+    firebase = pyrebase.initialize_app(config)
+
+    db = firebase.database()
+    bin = db.child("Bin").get().val()
+    lat, lon, cap = [], [], []
+    cap = []
+    print(bin)
+    for i in bin:
+        lati = (float(db.child("Bin").child(i).child("latitude").get().val()))
+        long = (float(db.child("Bin").child(i).child("longitude").get().val()))
+        cap.append([lati, long])
+
+    cap = json.dumps(cap)
+    print(cap)
+    return render(request,'new2.html',{"cap":cap})
+"""
+
+   from django.shortcuts import render
+   from django.contrib import auth
+
+   import json
+
+   import pyrebase
+
+   config = {
+       'apiKey': "AIzaSyB6s7DSe9M6MZk7g77cMTuoqIO6d-ebKwI",
+       'authDomain': "garbage-truck-monitoring.firebaseapp.com",
+       'databaseURL': "https://garbage-truck-monitoring.firebaseio.com",
+       'projectId': "garbage-truck-monitoring",
+       'storageBucket': "garbage-truck-monitoring.appspot.com",
+       'messagingSenderId': "549306067582",
+       'appId': "1:549306067582:web:bbaeac9ec829045099c62f",
+       'measurementId': "G-X9JCRW3TR0"
+   }
+   firebase = pyrebase.initialize_app(config)
+
+   db = firebase.database()
+   bin = db.child("Bin").get().val()
+   bin2 = db.child("BinPerLevel").get().val()
+   lat, lon, cap = [], [], []
+   cap_70, cap_20, cap_20_70 = [], [], []
+   for i in bin:
+       height = (int(db.child("Bin").child(i).child("height").get().val()))
+       lati = (float(db.child("Bin").child(i).child("latitude").get().val()))
+       long = (float(db.child("Bin").child(i).child("longitude").get().val()))
+       print(i,height)
+       try:
+           data = db.child("BinPerLevel").child(i).child("2020-01-21").get().val()
+           print(data)
+           last = next(reversed(data))
+           height2 = db.child("BinPerLevel").child(i).child("2020-01-21").child(last).child("height").get().val()
+           print("here",height2)
+           perc = (float(height2) / float(height)) * 100
+           print(perc)
+           if perc >= 70.0 :
+               cap_70.append([lati, long])
+           elif perc <= 20.0 :
+               cap_20.append([lati, long])
+           else:
+               cap_20_70.append([lati, long])
+       except:
+           pass
+   cap_20 = json.dumps(cap_20)
+   cap_20_70 = json.dumps(cap_20_70)
+   cap_70 = json.dumps(cap_70)
+   print(cap_70)
+   print(cap_20_70)
+   print(cap_20)
+
+   return render(request, 'marker.html', {"cap_70": cap_70, "cap_20_70": cap_20_70, "cap_20": cap_20})
+
+   
 def create_bin(request):
 
     return render(request,'CreateBin.html')
