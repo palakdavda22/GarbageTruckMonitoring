@@ -215,12 +215,12 @@ def post_create_bin(request):
     print(id)
     capacity = request.POST.get('capacity')
     height = request.POST.get("height")
-    idtoken= request.session['uid']
-    a = authe.get_account_info(idtoken)
-    a = a['users']
-    a = a[0]
-    a = a['localId']
-
+    # idtoken= request.session['uid']
+    # a = authe.get_account_info(idtoken)
+    # a = a['users']
+    # a = a[0]
+    # a = a['localId']
+    #
 
     data = {
         "latitude":lat,
@@ -247,11 +247,11 @@ def post_create_depot(request):
     lat = lat.replace("-", ".")
     lon = lon.replace("-", ".")
     print(id)
-    idtoken= request.session['uid']
-    a = authe.get_account_info(idtoken)
-    a = a['users']
-    a = a[0]
-    a = a['localId']
+    # idtoken= request.session['uid']
+    # a = authe.get_account_info(idtoken)
+    # a = a['users']
+    # a = a[0]
+    # a = a['localId']
 
     data = {
         "latitude":lat,
@@ -273,10 +273,10 @@ def post_create_vehicle(request):
         capacity = str(request.POST.get('capacity'))
         idtoken = request.session['uid']
         print(vehicle_no)
-        a = authe.get_account_info(idtoken)
-        a = a['users']
-        a = a[0]
-        a = a['localId']
+        # a = authe.get_account_info(idtoken)
+        # a = a['users']
+        # a = a[0]
+        # a = a['localId']
 
         data = {
             'capacity': capacity
@@ -299,11 +299,11 @@ def post_create_driver(request):
     gender =request.POST.get('gender')
     password = request.POST.get('password')
     date =request.POST.get('joiningdate')
-    idtoken= request.session['uid']
-    a = authe.get_account_info(idtoken)
-    a = a['users']
-    a = a[0]
-    a = a['localId']
+    #idtoken= request.session['uid']
+    # a = authe.get_account_info(idtoken)
+    # a = a['users']
+    # a = a[0]
+    # a = a['localId']
 
 
     data = {
@@ -790,11 +790,11 @@ def post_create_dump(request):
     lat = lat.replace("-", ".")
     lon = lon.replace("-", ".")
     print(id)
-    idtoken= request.session['uid']
-    a = authe.get_account_info(idtoken)
-    a = a['users']
-    a = a[0]
-    a = a['localId']
+    # idtoken= request.session['uid']
+    # a = authe.get_account_info(idtoken)
+    # a = a['users']
+    # a = a[0]
+    # a = a['localId']
 
     data = {
         "latitude":lat,
