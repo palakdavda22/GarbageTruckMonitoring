@@ -40,4 +40,7 @@ urlpatterns = [
     path('updateFeedback/', views.updateFeedback, name="updateFeedback"),
     path('g-routes/<int:vId>/', views.g_routes),
 
+    url(r'^createdump/',views.create_dump,name='create_dump'),
+    url(r'^post_create_dump/',views.post_create_dump,name='post_create_dump'),
+
 ];

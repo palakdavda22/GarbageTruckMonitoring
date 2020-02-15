@@ -3,33 +3,80 @@
     <meta charset="UTF-8">
     <title>Sign</title>
 <style>
-        div{
+        .logout{
         position : absolute;
         right : 10px;
         top : 5px
         }
     </style>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA3W-x4zqHwfCJ2xgzLvuO1MVPlWwp_XJI">
+    </script>
 </head>
-<body>
-<div>
+<body onload="initialize()">
+<div class = 'logout'>
 
 <button type="button" onclick="location.href='{% url 'log' %}'">Logout</button>
     </div>
 <H2>Create Bin</H2>
-<form action="/post_create_bin/" method="post">
+ <div id="map" style="width: 480px; height: 480px;position: relative;top: 5px">
+
+ </div>
+  <div style="position: relative;top: 5px">
+    <input id="address" type="textbox" value="Mumbai,India">
+    <input type="button" value="Encode" onclick="codeAddress()">
+  </div>
+<form action="/post_create_bin/" method="post" style="position: relative;top:10px">
     {% csrf_token %}
-    Latitude :
-    <input type="text" name="lat" required><br><br>
-    Longitude:
-	<input type="text" name="lon" required><br><br>
+{#    Latitude :#}
+{#    <input type="text" name="lat" required><br><br>#}
+{#    Longitude:#}
+{#	<input type="text" name="lon" required><br><br>#}
+    <input type="hidden" id = "latitude"  name = 'lat' value="1">
+    <input type="hidden" id = "longitude"  name = 'lon' value="1">
 	Capacity:
 	<input type="text" name="capacity" required><br><br>
-    <br><br>
     Height:
     <input type="text" name="height" required><br><br>
-    <br><br>
     <input type="submit" value="Submit">
 </form>
 
 </body>
+<script>
+    var geocoder;
+    var map;
+    var latitude;
+    var longitude;
+    function initialize() {
+        geocoder = new google.maps.Geocoder();
+        var latlng = new google.maps.LatLng(19.0821978, 72.7411);
+        var mapOptions = {
+            zoom: 8,
+            center: latlng
+        }
+        map = new google.maps.Map(document.getElementById('map'), mapOptions);
+    }
+
+    function codeAddress() {
+        var address = document.getElementById('address').value;
+        geocoder.geocode( { 'address': address}, function(results, status) {
+            if (status == 'OK') {
+                map.setCenter(results[0].geometry.location);
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location
+                });
+                console.log(results[0].geometry.location.lat());
+                latitude = results[0].geometry.location.lat();
+                longitude = results[0].geometry.location.lng();
+                console.log(results[0].geometry.location.lng());
+                document.getElementById('latitude').value = latitude.toString();
+                document.getElementById('longitude').value = longitude.toString();
+
+            } else {
+                alert('Geocode was not successful for the following reason: ' + status);
+            }
+        });
+    }
+</script>
 </html>
