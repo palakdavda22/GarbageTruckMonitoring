@@ -123,18 +123,25 @@
               </div>
             </div>
           </div>
+            <div class="col-lg-6 offset-lg-1">
+                <div class="banner_text">
+              <div class="banner_text_iner">
+            <form action="/postsign/" method="post" >
+                {% csrf_token %}
+                <h5>Email :</h5>
+                <input type="email" name="email"><br><br>
+                <h5>Password:</h5>
+                <input type="password" name="pass"><br><br>
+                <input type="submit" value="Login" class="btn_1">
+            </form>
+              </div>
+                </div>
+          </div>
         </div>
       </div>
     </section>
-<div style="position:relative;top: 40px">
-    <form action="/postsign/" method="post" >
-        {% csrf_token %}
-        Email :
-        <input type="email" name="email">
-        Password:
-        <input type="password" name="pass">
-        <input type="submit" value="SignIn">
-    </form>
-</div>
+
+
+
 </body>
 </html>
